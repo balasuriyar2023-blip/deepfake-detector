@@ -49,25 +49,24 @@ eval_tf = transforms.Compose([
     transforms.Normalize(MEAN, STD),
 ])
 
-# ── Face Detection ────────────────────────────────────
+# ── FIXED Face Detection (clean crop, no weird colors) ─
 def detect_face(img, mtcnn):
-    face = mtcnn(img)
-    if face is not None:
-        face = face.permute(1, 2, 0).cpu().numpy()
-        face = (face * 255).astype(np.uint8)
-        return Image.fromarray(face)
-    return img
+    boxes, _ = mtcnn.detect(img)
 
-# ── TTA Prediction ────────────────────────────────────
-def tta_predict(model, img):
-    images = [img, img.transpose(Image.FLIP_LEFT_RIGHT)]
-    preds = []
+    if boxes is not None:
+        x1, y1, x2, y2 = map(int, boxes[0])
 
-    for im in images:
-        t = eval_tf(im).unsqueeze(0).to(DEVICE)
-        preds.append(torch.softmax(model(t), dim=1))
+        # Add padding
+        pad = 20
+        x1 = max(0, x1 - pad)
+        y1 = max(0, y1 - pad)
+        x2 = min(img.width, x2 + pad)
+        y2 = min(img.height, y2 + pad)
 
-    return torch.mean(torch.stack(preds), dim=0)
+        face = img.crop((x1, y1, x2, y2))
+        return face
+
+    return img  # fallback
 
 # ── Grad-CAM ─────────────────────────────────────────
 def get_gradcam(model, img_tensor):
@@ -181,7 +180,7 @@ if uploaded_files:
 
         col1, col2 = st.columns(2)
         with col1:
-            st.image(face, caption="Detected Face", use_container_width=True)
+            st.image(face.resize((224, 224)), caption="Detected Face", use_container_width=True)
         with col2:
             st.image(cam_img, caption="Grad-CAM", use_container_width=True)
 
