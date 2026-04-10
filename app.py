@@ -129,8 +129,8 @@ def get_reason(prob, pred):
         return "Weak signals — verify with additional tools."
 
 # ── UI ────────────────────────────────────────────────
-st.title("🔍 DeepFake Face Detector")
-st.markdown("Upload face images to detect whether they are **Real** or **AI-Generated**.")
+st.title("🔍 AI-Generated Face Detector")
+st.markdown("Upload face images to detect whether they are **Real** or **AI-Generated (Fake)**.")
 st.markdown("**Model: EfficientNet-B0 | Accuracy: 91.69% | AUC: 0.9764**")
 st.divider()
 
