@@ -1,4 +1,4 @@
-# DeepFake Face Detector
+# AI-Generated Face Detector
 
 This project presents a deep learning-based system for detecting whether a face image is real or AI-generated. The model is built using EfficientNet-B0 and incorporates Grad-CAM to provide visual explanations of its predictions. A Streamlit interface is used for interactive testing and demonstration.
 
